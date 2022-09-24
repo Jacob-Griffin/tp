@@ -1,0 +1,9 @@
+/*:host {
+  display: flex;
+  justify-content: center;
+}
+
+canvas{
+  border-radius: 5px;
+  box-shadow: 0 3px 3px 3px #888;
+}*/
