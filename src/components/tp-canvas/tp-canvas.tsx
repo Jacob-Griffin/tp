@@ -35,24 +35,13 @@ export class TpCanvas {
 
   //Canvas State
   currentPath;             //The current line that's actively being drawn               :(Path2D)
-  fullPath = new Path2D(); //The complete drawing as a single path                      :(Path2D)
   paths = [];              //List of paths drawn (support for undo/redo)                :(Path2D[])
-  clearedPaths = [];       //Backup of the path list in case a clear needs to be undone :(Path2D[])
   redoStack = [];          //Stack of paths that were undone (clears on new path drawn) :(Path2D[])
   currentWidth = "small"   //Current Pen Size                                           :(String)
 
   componentDidRender() {
     //Set up the canvas context now that the canvas exists
-    this.ctx = this.canvasElement.getContext('2d');
-    this.ctx.strokeStyle = "rgb(0,0,0)";
-    this.ctx.fillStyle = "rgb(255,255,255)";
-    this.ctx.lineWidth = this.lineWidths.small;
-    this.ctx.lineCap = "round";
-    this.ctx.lineJoin = "round";
-    this.ctx.imageSmoothingEnabled = true;
-    this.ctx.imageSmoothingQuality = "high";
-
-    this.ctx.fillRect(0, 0, this.width, this.height);//Background
+    this.setupContext();
 
     //Listen for the controller buttons to say anything
     document.addEventListener('undoInput', this.undo);
@@ -75,6 +64,20 @@ export class TpCanvas {
     document.addEventListener('pointercancel', this.finishLine);
 
     //Note, leaving the canvas area DOES NOT stop the line.
+  }
+
+  setupContext(){
+    this.ctx = this.canvasElement.getContext('2d');
+    this.ctx.strokeStyle = "rgb(0,0,0)";
+    this.ctx.fillStyle = "rgb(255,255,255)";
+    this.ctx.lineWidth = this.lineWidths.small;
+    this.currentWidth = "small";
+    this.ctx.lineCap = "round";
+    this.ctx.lineJoin = "round";
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = "high";
+
+    this.ctx.fillRect(0, 0, this.width, this.height);//Background
   }
 
   startDraw = (event) => {
@@ -136,6 +139,9 @@ export class TpCanvas {
   }
 
   undo = () => {
+    if(this.paths.length == 0){
+      return;
+    }
     this.redoStack.push(this.paths.pop());
 
     let currentStroke = this.ctx.strokeStyle;

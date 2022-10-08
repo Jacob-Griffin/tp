@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop} from '@stencil/core';
 
 @Component({
   tag: 'tp-game-column',
@@ -9,23 +9,24 @@ export class TpGameColumn {
 
   submitButton;
   canvas;
-  gameData = {
-    round:2,
-    from:"haha",
-    to:"hehe",
-    content:"Here's a prompt",
-    contentType:"text",
-  };
+  @Prop() gameData: {round,to,from,content,contentType};
 
   componentDidRender(){
     this.submitButton.addEventListener('click',this.submitCard);
   }
 
   submitCard = () =>{
-    this.canvas.exportDrawing()
-    .then((image)=>{
-      image;
-    });
+    if(this.gameData.contentType == "text"){
+      this.canvas.exportDrawing()
+      .then((image)=>{
+        image;
+        document.dispatchEvent(new CustomEvent('submitted',{detail:{image}}));
+      });
+    }
+    else if(this.gameData.contentType == "image"){
+      const text = this.canvas.textArea.value;
+      document.dispatchEvent(new CustomEvent('submitted',{detail:{text}}));
+    }
   }
 
   render() {
@@ -33,6 +34,7 @@ export class TpGameColumn {
       <section class="flex justify-center flex-row w-full lg:h-full">
         <section class="flex flex-col items-center w-full max-w-screen-md lg:max-w-none lg:w-50 lg:flex-wrap bg-gray-300 backdrop-blur-xl p-6 lg:p-4 lg:pr-2 box-border">
           <div class="lg:h-full lg:w-2/5 lg:p-2 w-full flex flex-col items-center gap-4 justify-center box-border mb-4">
+            <p>Round {this.gameData.round}</p>
             <p><strong>From:</strong> {this.gameData.from}</p>
             
               {(this.gameData.contentType == "text")

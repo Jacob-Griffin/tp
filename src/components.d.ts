@@ -22,6 +22,7 @@ export namespace Components {
     interface TpCanvasControls {
     }
     interface TpGameColumn {
+        "gameData": {round,to,from,content,contentType};
     }
 }
 declare global {
@@ -85,6 +86,7 @@ declare namespace LocalJSX {
     interface TpCanvasControls {
     }
     interface TpGameColumn {
+        "gameData"?: {round,to,from,content,contentType};
     }
     interface IntrinsicElements {
         "app-home": AppHome;
